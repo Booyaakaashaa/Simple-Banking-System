@@ -1,0 +1,16 @@
+type: code
+files:
+- name: main.py
+  visible: true
+  text: |-
+    # find a mistake below
+    file = open('books.txt', 'w', encoding='utf-8')
+
+    # closing and other operations are done below
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/8695#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: Wed, 17 Feb 2021 22:36:46 UTC
+record: -1
