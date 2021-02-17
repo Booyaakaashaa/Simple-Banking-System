@@ -3,6 +3,7 @@ import secrets
 import string
 
 accounts = {}
+flag = 0
 while 1:
     choice = input("""1. Create an account
 2. Log into account
@@ -37,11 +38,14 @@ Your card PIN:
 """)
             print()
             if acc_choice == "0":
+                flag = 1
                 break
             elif acc_choice == "1":
                 print("Balance: {}\n".format(bal))
             elif acc_choice == "2":
                 print("You have successfully logged out!\n")
                 break
+        if flag:
+            break
 
 
