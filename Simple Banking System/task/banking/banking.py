@@ -1,6 +1,16 @@
 # Write your code here
 import secrets
 import string
+import sqlite3
+
+conn = sqlite3.connect('card.s3db')
+cur = conn.cursor()
+cur.execute("""CREATE TABLE IF NOT EXISTS card(
+id INTEGER,
+number TEXT,
+pin TEXT,
+balance INTEGER DEFAULT 0)""")
+conn.commit()
 
 
 def luhn(in_num):
@@ -11,6 +21,7 @@ def luhn(in_num):
 
 accounts = {}
 flag = 0
+user_num = 0
 while 1:
     choice = input("""1. Create an account
 2. Log into account
@@ -21,16 +32,19 @@ while 1:
         print("Bye!")
         break
     elif choice == "1":
+        user_num += 1
         credit_card_num = "400000" + "".join(secrets.choice(string.digits) for _ in range(9))
         credit_card_num = credit_card_num + luhn(credit_card_num)
         pin = "".join(secrets.choice(string.digits) for _ in range(4))
         bal = 0
+        cur.execute("INSERT INTO card VALUES ({}, {}, {}, {})".format(user_num, credit_card_num, pin, bal))
         print("""Your card has been created
 Your card number:
 {}
 Your card PIN:
 {}\n""".format(credit_card_num, pin))
         accounts[credit_card_num] = {"pin": pin, "balance": bal}
+        conn.commit()
     elif choice == "2":
         cc_num = input("Enter your card number:\n")
         peen = input("Enter your PIN:\n")
@@ -55,4 +69,3 @@ Your card PIN:
                 break
         if flag:
             break
-
