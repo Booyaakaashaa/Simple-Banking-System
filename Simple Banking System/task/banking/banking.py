@@ -55,7 +55,10 @@ Your card PIN:
         print('You have successfully logged in!\n')
         while 1:
             acc_choice = input("""1. Balance
-2. Log out
+2. Add income
+3. Do transfer
+4. Close account
+5. Log out
 0. Exit
 """)
             print()
@@ -63,8 +66,49 @@ Your card PIN:
                 flag = 1
                 break
             elif acc_choice == "1":
-                print("Balance: {}\n".format(bal))
+                cur.execute("SELECT balance FROM card WHERE number = {}".format(cc_num))
+                print("Balance: {}\n".format(cur.fetchone()[0]))
             elif acc_choice == "2":
+                cur.execute("SELECT balance FROM card WHERE number = {}".format(cc_num))
+                bal = cur.fetchone()[0] + int(input("Enter income:\n"))
+                print(bal)
+                cur.execute("""UPDATE card
+                SET balance = {}
+                WHERE number = {}""".format(bal, cc_num))
+                conn.commit()
+                print("Income was added!\n")
+            elif acc_choice == "3":
+                dest_card = input("Transfer\nEnter card number:\n")
+                if cc_num == dest_card:
+                    print("You can't transfer money to the same account!\n")
+                    continue
+                if luhn(dest_card) != "0":
+                    print("Probably you made a mistake in the card number. Please try again!\n")
+                else:
+                    cur.execute("SELECT balance FROM card WHERE number = {}".format(dest_card))
+                    dest_balance = cur.fetchone()
+                    if not dest_balance:
+                        print("Such a card does not exist\n")
+                    else:
+                        cur.execute("SELECT balance FROM card WHERE number = {}".format(cc_num))
+                        source_balance = cur.fetchone()[0]
+                        transfer_amount = int(input("Enter how much money you want to transfer:\n"))
+                        if source_balance < transfer_amount:
+                            print("Not enough money!\n")
+                        else:
+                            dest_balance = dest_balance[0]
+                            sent = source_balance - transfer_amount
+                            received = dest_balance + transfer_amount
+                            cur.execute("UPDATE card SET balance = {} WHERE number = {}".format(received, dest_card))
+                            cur.execute("UPDATE card SET balance = {} WHERE number = {}".format(sent, cc_num))
+                            conn.commit()
+                            print("Success!\n")
+            elif acc_choice == "4":
+                cur.execute("DELETE FROM card WHERE number = {}".format(cc_num))
+                print("The account has been closed!\n")
+                conn.commit()
+                break
+            elif acc_choice == "5":
                 print("You have successfully logged out!\n")
                 break
         if flag:
